@@ -29,8 +29,9 @@ cc=interp1(z,c,zz,'pchip','extrap');
 xmax=100000; %max value of x.
 dx=50; %step size of x (lower = longer calculations and bigger files)
 x0=0; %start x position
-z0=91; %start depth positive is down
+z0=300; %start depth positive is down
 theta0=linspace(-4,4,20); %starting angle (can be array of angles)
+Ylimit = [0 zz(end)];
 
 %% run Simulation
 arch = computer('arch');
@@ -61,12 +62,12 @@ for m=1:length(theta0) % loops through starting angles
         
         
         Z(i)=(R0(i-1)*(cosd(angle(i))-cosd(angle(i-1))))+Z(i-1); %new depth
-        if Z(i)<1 %if new depth is above surface (or out of bounds)
+        if Z(i)<=0 %if new depth is above surface (or out of bounds)
             Z(i)=0; %set depth to surface
             angle(i)=-angle(i-1); %reflect ray
             c0(i)=cc(1); %set speed to surface speed
             G=g(1); %set gradient to surface gradient
-        elseif Z(i)>zz(end) %if new depth is under seafloor (or out of bounds)
+        elseif Z(i)>=zz(end) %if new depth is under seafloor (or out of bounds)
             Z(i)=zz(end);
             angle(i)=-angle(i-1);
             c0(i)=cc(end);
@@ -76,7 +77,7 @@ for m=1:length(theta0) % loops through starting angles
             c0(i)=cc(floor(Z(i)+1))+(Z(i)+1-floor(Z(i)+1))*((cc(ceil(Z(i)+1))-cc(floor(Z(i)+1)))/(ceil(Z(i)+1)-floor(Z(i)+1))); %lineair interpolation of speed at current depth
             
             
-            G=g(round(Z(i))); %gradient at current depth (should also be interpolated like above but im lazy)
+            G=g(round(Z(i)+1)); %gradient at current depth (should also be interpolated like above but im lazy)
             
         end
         
@@ -107,7 +108,7 @@ grid on
 title('Sound Speed Profile')
 xlabel('Sound Speed, m/s')
 ylabel('Depth, m')
-ylim([0 zz(end)])
+ylim(Ylimit)
 subplot(1,5,2:5)
 
 
@@ -117,7 +118,7 @@ for m=1:length(theta0)
 end
 hold off
 xlim([0 xmax/1000])
-ylim([0 zz(end)])
+ylim(Ylimit)
 axis ij
 grid on
 title('Ray Trace, Start Depth: '+string(z0)+'m')
