@@ -1,4 +1,4 @@
-%% UNDERWATER RAT TRACER.
+%% UNDERWATER RAY TRACER.
 
 % Dimitri Croes
 % Engineering physics student at Eindhoven, The Netherlands
